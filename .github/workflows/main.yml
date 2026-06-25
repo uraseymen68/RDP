@@ -9,7 +9,10 @@ jobs:
     steps:
     - name: Ngrok Indiriliyor
       run: |
-        Invoke-WebRequest https://bin.equinox.io/c/b34af1m4Dbx/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+        Invoke-WebRequest https://bin.equinox.io/c/b34af1m4Dbx/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip -ErrorAction Ignore
+        if (-not (Test-Path ngrok.zip) -or (Get-Item ngrok.zip).Length -lt 100kb) {
+          Invoke-WebRequest https://github.com/ngrok/ngrok-go/releases/download/v3.1.0/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+        }
         Expand-Archive ngrok.zip
     - name: Ngrok Kimlik Dogrulama
       run: |
@@ -20,6 +23,6 @@ jobs:
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
     - name: Tunel Baslatiliyor
       run: |
-        Start-Process .\ngrok\ngrok.exe -ArgumentList "tcp 3389"
+        Start-Process .\ngrok\ngrok.exe -ArgumentList "tcp --region eu 3389"
         echo "VDS Hazirlaniyor... Lütfen ngrok panelinizden (Endpoints kismindan) baglanti adresinizi kontrol edin."
         Start-Sleep -Seconds 21600
