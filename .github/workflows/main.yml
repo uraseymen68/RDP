@@ -1,0 +1,25 @@
+name: Windows-2022-RDP
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+    - name: Ngrok Indiriliyor
+      run: |
+        Invoke-WebRequest https://bin.equinox.io/c/b34af1m4Dbx/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+        Expand-Archive ngrok.zip
+    - name: Ngrok Kimlik Dogrulama
+      run: |
+        .\ngrok\ngrok.exe authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+    - name: Uzak Masaustunu Aktif Et
+      run: |
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+    - name: Tunel Baslatiliyor
+      run: |
+        Start-Process .\ngrok\ngrok.exe -ArgumentList "tcp 3389"
+        echo "VDS Hazirlaniyor... Lütfen ngrok panelinizden (Endpoints kismindan) baglanti adresinizi kontrol edin."
+        Start-Sleep -Seconds 21600
