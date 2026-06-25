@@ -9,7 +9,10 @@ jobs:
     steps:
     - name: Ngrok Resmi Siteden Indiriliyor
       run: |
-        Invoke-WebRequest https://bin.equinox.io/handler/ngrok/stable/windows_amd64.zip -OutFile ngrok.zip
+        $url = "https://bin.equinox.io/handler/ngrok/stable/windows_amd64.zip"
+        $output = "ngrok.zip"
+        Import-Module BitsTransfer
+        Start-BitsTransfer -Source $url -Destination $output
         Expand-Archive ngrok.zip -DestinationPath ngrok_files
     - name: Ngrok Kimlik Dogrulama
       run: |
@@ -21,5 +24,5 @@ jobs:
     - name: Tunel Baslatiliyor
       run: |
         Start-Process .\ngrok_files\ngrok.exe -ArgumentList "tcp --region eu 3389"
-        echo "VDS Başarıyla Başlatıldı! Ngrok panelinizden (Endpoints) adresi alın."
+        echo "VDS Basariyla Baslatildi! Ngrok panelinizden (Endpoints) adresi alin."
         Start-Sleep -Seconds 21600
